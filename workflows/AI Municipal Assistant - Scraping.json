@@ -1,0 +1,152 @@
+{
+  "name": "O Democrata Corupá - Puppeteer",
+  "nodes": [
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"termo\": \" {{ $json.query }}\",\n  \"webhook\": \"https://webhook.\"\n}\n",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "json"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        224,
+        0
+      ],
+      "id": "10126c63-e585-4bff-86b6-bfbd2d1bb1c8",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "a193fb17-e306-4aaa-a148-54599b504600",
+              "name": "textoExtraido",
+              "value": "={{ $json.textoExtraido }}",
+              "type": "string"
+            },
+            {
+              "id": "59e44298-07ee-4fae-bc04-2bed67a95761",
+              "name": "linkOriginal",
+              "value": "={{ $json.linkOriginal }}",
+              "type": "string"
+            },
+            {
+              "id": "91154db3-3215-4b0d-a38d-90a491b5dece",
+              "name": "cortado",
+              "value": "={{ $json.cortado }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        672,
+        0
+      ],
+      "id": "0939dc86-d917-4406-a3d4-c6a596a77447",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "inputSource": "passthrough"
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "ad2373c7-ba55-4427-898b-30d0d64afcb3",
+      "name": "When Executed by Another Workflow"
+    },
+    {
+      "parameters": {
+        "jsCode": "const textoOriginal = items[0].json.textoExtraido || \"\";\nconst limite = 10000;\n\nlet textoFinal = textoOriginal;\nlet cortado = false;\n\nif (textoOriginal.length > limite) {\n  textoFinal = textoOriginal.substring(0, limite);\n  cortado = true;\n}\n\nreturn [{\n  json: {\n    textoExtraido: textoFinal,\n    cortado: cortado,\n    linkOriginal: items[0].json.linkOriginal || \"\"\n  }\n}];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        448,
+        0
+      ],
+      "id": "34838253-0507-47bd-8ca7-12a3364609bc",
+      "name": "Code"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "55591e30-87a7-4a80-a2a1-900c76ad8213",
+  "meta": {
+    "instanceId": "62a55d62765f817a1a270c7d09d8b21dc7f8b1569d73708535f4e086c758610d"
+  },
+  "id": "TYHax5AHMLCUgt7D",
+  "tags": [
+    {
+      "updatedAt": "2025-05-15T20:45:21.005Z",
+      "createdAt": "2025-05-15T20:45:21.005Z",
+      "id": "",
+      "name": "Democrata"
+    }
+  ]
+}
