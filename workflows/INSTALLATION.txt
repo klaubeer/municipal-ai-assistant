@@ -1,0 +1,19 @@
+Installation
+
+This project contains example workflows for n8n.
+
+To use them:
+
+Download the workflow JSON file from the workflow folder.
+Open your n8n instance.
+Click Import workflow.
+Select the downloaded JSON file.
+Configure your credentials (Supabase, APIs, etc.).
+Activate the workflow.
+
+Requirements
+
+n8n (self-hosted or cloud)
+Supabase database
+LLM provider (OpenAI or compatible)
+Messaging platform integration (optional)
