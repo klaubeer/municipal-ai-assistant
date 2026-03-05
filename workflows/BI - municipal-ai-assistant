@@ -1,0 +1,360 @@
+{
+  "name": "AI Municipal Assistant - Usage Analytics",
+  "nodes": [
+    {
+      "parameters": {
+        "useCustomSchema": true,
+        "operation": "getAll",
+        "tableId": "chat_messages",
+        "limit": 1000,
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "id",
+              "condition": "gt",
+              "keyValue": "1"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        224,
+        0
+      ],
+      "id": "5f050fdc-c5ff-4c1b-8518-5b3d4f39be77",
+      "name": "Supabase",
+      "credentials": {
+        "supabaseApi": {
+          "id": "",
+          "name": ""
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const ultimaExecucao = new Date().toISOString();\nreturn [{ json: { ultimaExecucao } }];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -48,
+        400
+      ],
+      "id": "63f0d629-4bdb-41f8-917b-f339ad438fc5",
+      "name": "Code"
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "tableId": "chat_messages",
+        "limit": 1000,
+        "matchType": "allFilters",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "created_at",
+              "condition": "gt",
+              "keyValue": "={{ $json.ultimaExecucao }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        128,
+        384
+      ],
+      "id": "3a6a0ce8-99a9-47b3-9eaa-5ac208aeff37",
+      "name": "Supabase1",
+      "credentials": {
+        "supabaseApi": {
+          "id": "",
+          "name": ""
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Acessando os dados corretamente\nconst registros = items.map(item => item.json);  // Pega todos os dados do array 'items'\n\n// Inicializar variáveis\nconst consultasPorPeriodo = { dia: 0, semana: 0, mes: 0, ano: 0 };\n\n// Definir funções auxiliares\nconst hoje = new Date();\nconst obterPeriodo = (data) => {\n  const diffTime = hoje - new Date(data);\n  if (diffTime <= 86400000) consultasPorPeriodo.dia++;\n  if (diffTime <= 604800000) consultasPorPeriodo.semana++;\n  if (diffTime <= 2592000000) consultasPorPeriodo.mes++;\n  if (diffTime <= 31536000000) consultasPorPeriodo.ano++;\n};\n\n// Processar os registros\nregistros.forEach((registro) => {\n  obterPeriodo(registro.created_at);\n});\n\n// Retornar os resultados\nreturn [\n  {\n    json: {\n      consultasPorPeriodo: [\n        consultasPorPeriodo.dia,\n        consultasPorPeriodo.semana,\n        consultasPorPeriodo.mes,\n        consultasPorPeriodo.ano\n      ]\n    }\n  }\n];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        608,
+        -208
+      ],
+      "id": "cdb546b1-f542-48ab-9b3b-493f0c13afa1",
+      "name": "Consultas por Período"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Acessando os dados corretamente\nconst registros = items.map(item => item.json);  // Pega todos os dados do array 'items'\n\n// Inicializar variável para contar categorias\nconst pesquisasPorCategoria = {\n  \"Todos\": 0, \"Acórdão\": 0, \"Ata de registro de preços\": 0, \"Atas\": 0, \"Atos da Presidência\": 0, \"Atos de Mesa\": 0,\n  \"Audiências Públicas\": 0, \"Chamadas Públicas\": 0, \"Comunicados\": 0, \"Concursos\": 0, \"Contas Públicas\": 0, \"Contratos\": 0,\n  \"Convênios\": 0, \"Decisão\": 0, \"Decretos\": 0, \"Editais de Notificação\": 0, \"Edital\": 0, \"Empenhos\": 0, \"Estatutos\": 0,\n  \"Extratos Diversos\": 0, \"Instrução Normativa\": 0, \"Leilões\": 0, \"Leis\": 0, \"Licenciamento ambiental\": 0, \"Licitações\": 0,\n  \"Medida Provisória\": 0, \"Outras publicações\": 0, \"Portarias\": 0, \"Prestação de contas\": 0, \"Regimentos internos\": 0, \"Resoluções\": 0,\n  \"Sem categoria\": 0\n};\n\n// Palavras-chave\nconst palavrasChave = [\n  \"Todos\", \"Acórdão\", \"Ata de registro de preços\", \"Atas\", \"Atos da Presidência\", \"Atos de Mesa\", \"Audiências Públicas\",\n  \"Chamadas Públicas\", \"Comunicados\", \"Concursos\", \"Contas Públicas\", \"Contratos\", \"Convênios\", \"Decisão\", \"Decretos\",\n  \"Editais de Notificação\", \"Edital\", \"Empenhos\", \"Estatutos\", \"Extratos Diversos\", \"Instrução Normativa\", \"Leilões\",\n  \"Leis\", \"Licenciamento ambiental\", \"Licitações\", \"Medida Provisória\", \"Outras publicações\", \"Portarias\", \"Prestação de contas\",\n  \"Regimentos internos\", \"Resoluções\"\n].map(palavra => palavra.toLowerCase());\n\n// Processar registros\nregistros.forEach((registro) => {\n  if (registro.user_message) {\n    const mensagem = registro.user_message.toLowerCase();\n    let categoriaEncontrada = false;\n\n    palavrasChave.forEach((categoria, index) => {\n      if (mensagem.includes(categoria)) {\n        pesquisasPorCategoria[Object.keys(pesquisasPorCategoria)[index]]++;\n        categoriaEncontrada = true;\n      }\n    });\n\n    if (!categoriaEncontrada) {\n      pesquisasPorCategoria[\"Sem categoria\"]++;\n    }\n  }\n});\n\n// Filtrar categorias com contagem maior que 0\nconst categoriasComResultado = Object.fromEntries(\n  Object.entries(pesquisasPorCategoria).filter(([key, value]) => value > 0)\n);\n\n// Retornar as categorias com resultado maior que 0\nreturn [\n  {\n    json: {\n      categorias: Object.keys(categoriasComResultado),\n      resultados: Object.values(categoriasComResultado)\n    }\n  }\n];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        608,
+        144
+      ],
+      "id": "667c7915-2ec7-4db6-ac5e-420f2a64fc76",
+      "name": "Pesquisas por Categoria"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Acessando os dados corretamente\nconst registros = items.map(item => item.json);\n\n// Inicializar variável para contar números únicos\nconst numerosWhatsApp = new Set();\n\n// Processar os registros\nregistros.forEach((registro) => {\n  numerosWhatsApp.add(registro.phone);\n});\n\n// Retornar o número de WhatsApp únicos\nreturn [\n  {\n    json: {\n      numerosWhatsApp: numerosWhatsApp.size\n    }\n  }\n];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        608,
+        -48
+      ],
+      "id": "c4a89ee1-3c57-4e26-8417-af9cc0684f76",
+      "name": "Números de WhatsApp Diferentes"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Acessando os dados corretamente\nconst registros = items.map(item => item.json);  // Pega todos os dados do array 'items'\n\n// Inicializar variáveis para armazenar o número de ocorrências\nconst pesquisasPorAssunto = {\n  \"IPTU\": 0,\n  \"Secretária de Saúde\": 0,\n  \"Secretária de Turismo\": 0,\n  \"Secretária de Águas\": 0,\n  \"Secretária de Planejamento\": 0,\n  \"ISS\": 0,\n  \"Obras\": 0,\n  \"Prestação de Serviços\": 0,\n  \"Salários\": 0,\n  \"Contrato\": 0,\n  \"Coleta de Lixo\": 0,\n  \"Sanitário\": 0,\n  \"Alvarás\": 0,\n  \"Multa\": 0,\n  \"Licenciamento Ambiental\": 0,\n  \"Licitações\": 0,\n  \"Transporte Público\": 0,\n  \"Educacional\": 0,\n  \"Habitação\": 0,\n  \"Saúde Pública\": 0,\n  \"Segurança Pública\": 0,\n  \"Vigilância Sanitária\": 0,\n  \"Meio Ambiente\": 0,\n  \"Infraestrutura Urbana\": 0\n};\n\n// Definir palavras-chave para os assuntos\nconst palavrasChave = {\n  \"IPTU\": [\"IPTU\", \"iptu\"],\n  \"Secretária de Saúde\": [\"Secretária de Saúde\", \"saúde\", \"secretaria de saúde\"],\n  \"Secretária de Turismo\": [\"Secretária de Turismo\", \"turismo\", \"secretaria de turismo\"],\n  \"Secretária de Águas\": [\"Secretária de Águas\", \"águas\", \"secretaria de águas\"],\n  \"Secretária de Planejamento\": [\"Secretária de Planejamento\", \"planejamento\", \"secretaria de planejamento\"],\n  \"ISS\": [\"ISS\", \"imposto sobre serviços\", \"iss\"],\n  \"Obras\": [\"obras\", \"infraestrutura\", \"recapeamento\", \"construção\"],\n  \"Prestação de Serviços\": [\"prestação de serviços\", \"serviços\", \"serviços públicos\"],\n  \"Salários\": [\"salários\", \"remuneração\"],\n  \"Contrato\": [\"contrato\", \"contratos\", \"licitação\", \"contratação\"],\n  \"Coleta de Lixo\": [\"coleta de lixo\", \"limpeza pública\"],\n  \"Sanitário\": [\"sanitário\", \"saneamento\", \"esgoto\"],\n  \"Alvarás\": [\"alvarás\", \"licenciamento\", \"alvará de funcionamento\"],\n  \"Multa\": [\"multa\", \"penalidade\", \"infração\"],\n  \"Licenciamento Ambiental\": [\"licenciamento ambiental\", \"meio ambiente\"],\n  \"Licitações\": [\"licitação\", \"pregão eletrônico\", \"pregão\"],\n  \"Transporte Público\": [\"transporte público\", \"ônibus\", \"transporte coletivo\"],\n  \"Educacional\": [\"educação\", \"escola\", \"educacional\", \"escolas municipais\"],\n  \"Habitação\": [\"habitação\", \"moradia\", \"programa habitacional\"],\n  \"Saúde Pública\": [\"saúde pública\", \"hospitais\", \"unidades de saúde\"],\n  \"Segurança Pública\": [\"segurança pública\", \"polícia\", \"segurança\"],\n  \"Vigilância Sanitária\": [\"vigilância sanitária\", \"controle sanitário\", \"vigilância\"],\n  \"Meio Ambiente\": [\"meio ambiente\", \"sustentabilidade\", \"preservação ambiental\"],\n  \"Infraestrutura Urbana\": [\"infraestrutura urbana\", \"urbanismo\", \"recapeamento\"]\n};\n\n// Processar os registros\nregistros.forEach((registro) => {\n  if (registro.bot_message) {\n    const botMessage = registro.bot_message.toLowerCase();  // Converter para minúsculas\n\n    // Buscar palavras-chave e atribuir aos assuntos\n    Object.entries(palavrasChave).forEach(([categoria, palavras]) => {\n      palavras.forEach(palavra => {\n        if (botMessage.includes(palavra.toLowerCase())) {\n          pesquisasPorAssunto[categoria]++;\n        }\n      });\n    });\n  }\n});\n\n// Filtrar os assuntos com contagem maior que 0\nconst assuntosComResultado = Object.fromEntries(\n  Object.entries(pesquisasPorAssunto).filter(([key, value]) => value > 0)\n);\n\n// Retornar os resultados\nreturn [\n  {\n    json: {\n      pesquisasPorAssunto: assuntosComResultado\n    }\n  }\n];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        608,
+        304
+      ],
+      "id": "cfb26131-1c55-4c40-bf70-c5e297d43311",
+      "name": "Pesquisas por Assunto"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Acessando os dados corretamente\n// NOTA: Para este nó 'Code' receber mais registros, o nó Supabase ANTERIOR a ele\n// (o nó que busca os dados brutos, provavelmente \"Supabase\") deve ser configurado\n// para buscar mais de 1000 registros, se necessário, ou um número suficiente\n// para garantir que haja 20 mensagens com mais de 15 caracteres.\n// Por padrão, o nó Supabase no seu workflow está com limit: 1000.\n// Se as mensagens mais antigas (fora dos 1000) forem relevantes, você precisaria\n// ajustar o 'limit' no nó 'Supabase' para um número maior.\nconst registros = items.map(item => item.json);\n\n// 1. Filtrar registros por 'user_message' com mais de 15 caracteres\n//    e que a user_message não seja nula ou vazia.\nconst filteredRegistros = registros.filter(registro => {\n  return registro.user_message && registro.user_message.length > 15;\n});\n\n// 2. Ordenar os registros filtrados por data de criação em ordem decrescente\n//    (do mais recente para o mais antigo)\nfilteredRegistros.sort((a, b) => {\n  const dateA = new Date(a.created_at);\n  const dateB = new Date(b.created_at);\n  return dateB.getTime() - dateA.getTime(); // Ordena do mais novo para o mais antigo\n});\n\n// 3. Pegar as 20 últimas consultas (que agora são as 20 primeiras após a ordenação e filtro)\nconst ultimasConsultas = filteredRegistros.slice(0, 20).map((registro) => {\n  const originalDate = new Date(registro.created_at);\n  \n  // Subtrai EXATAMENTE 3 horas (3 * 60 minutos * 60 segundos * 1000 milissegundos)\n  const offsetMs = 3 * 60 * 60 * 1000; \n  const adjustedDate = new Date(originalDate.getTime() - offsetMs);\n\n  // Formatar a data para exibição\n  const formattedTimestamp = adjustedDate.toLocaleString('pt-BR', {\n      dateStyle: 'short',\n      timeStyle: 'short'\n  });\n\n  return {\n    timestamp: formattedTimestamp,\n    query: registro.user_message\n  };\n});\n\n// Retornar os resultados\nreturn [\n  {\n    json: {\n      ultimasConsultas\n    }\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        608,
+        448
+      ],
+      "id": "75bf6865-c3da-4bea-9a35-e1b1ebbd5bf7",
+      "name": "Últimas 10 Consultas"
+    },
+    {
+      "parameters": {
+        "path": "dashboard",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        0,
+        0
+      ],
+      "id": "b9cd5002-c46b-46f4-a6a7-9ae8cab90f9f",
+      "name": "Webhook",
+      "webhookId": "6f37c6e9-e9c6-47ca-b864-13e3385dca9d"
+    },
+    {
+      "parameters": {
+        "respondWith": "allIncomingItems",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.2,
+      "position": [
+        1568,
+        112
+      ],
+      "id": "f366f29c-c247-406a-9a03-aaaa34835643",
+      "name": "Respond to Webhook"
+    },
+    {
+      "parameters": {
+        "numberInputs": 5
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.1,
+      "position": [
+        1120,
+        80
+      ],
+      "id": "2fbfbe72-1695-4b39-9065-f7a365d2fd90",
+      "name": "Merge"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Unificando todos os dados em um único objeto\nconst dadosUnificados = {\n  consultasPorPeriodo: items[0]?.json?.consultasPorPeriodo || [],\n  numerosWhatsApp: items[1]?.json?.numerosWhatsApp || 0,\n  categorias: items[2]?.json?.categorias || [],\n  resultados: items[2]?.json?.resultados || [],\n  pesquisasPorAssunto: items[3]?.json?.pesquisasPorAssunto || {},\n  ultimasConsultas: items[4]?.json?.ultimasConsultas || []\n};\n\n// Garantindo que todos os dados estejam no formato correto\nreturn [\n  {\n    json: dadosUnificados\n  }\n];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1344,
+        128
+      ],
+      "id": "656d80e4-7fa2-432a-899c-f0e0db3018be",
+      "name": "Code1"
+    }
+  ],
+  "pinData": {
+    "Code": [
+      {
+        "json": {
+          "ultimaExecucao": "2025-05-22T21:53:59.326Z"
+        }
+      }
+    ]
+  },
+  "connections": {
+    "Supabase": {
+      "main": [
+        [
+          {
+            "node": "Consultas por Período",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Pesquisas por Categoria",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Números de WhatsApp Diferentes",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Pesquisas por Assunto",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Últimas 10 Consultas",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "Supabase1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Pesquisas por Categoria": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 2
+          }
+        ]
+      ]
+    },
+    "Consultas por Período": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Supabase",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Números de WhatsApp Diferentes": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Pesquisas por Assunto": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 3
+          }
+        ]
+      ]
+    },
+    "Últimas 10 Consultas": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 4
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Code1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code1": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "c66616bd-4922-450e-ad1c-7cb46ef2f729",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": ""
+  },
+  "id": "FomlySHH7qcmdyKk",
+  "tags": [
+    {
+      "updatedAt": "2025-05-15T20:45:21.005Z",
+      "createdAt": "2025-05-15T20:45:21.005Z",
+      "id": "mdvOYBjPZkSkXQy1",
+      "name": "Democrata"
+    }
+  ]
+}
