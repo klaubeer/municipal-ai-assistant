@@ -1,6 +1,6 @@
 # 🇧🇷 PT-BR
 
-# AI Assistant for Municipal Public Information
+# O Democrata - Assistente de IA para informações públicas municipais
 
 Assistente baseado em **Inteligência Artificial e Large Language Models** desenvolvido para simplificar o acesso a **informações públicas municipais**.
 
