@@ -1,19 +1,19 @@
-Installation
+## Instalação
 
-This project contains example workflows for n8n.
+Este projeto contém workflows prontos para importar no n8n.
 
-To use them:
+Para utilizá-los:
 
-Download the workflow JSON file from the workflow folder.
-Open your n8n instance.
-Click Import workflow.
-Select the downloaded JSON file.
-Configure your credentials (Supabase, APIs, etc.).
-Activate the workflow.
+1. Baixe o arquivo JSON do workflow na pasta `/workflows`.
+2. Abra sua instância do n8n.
+3. Clique em **Importar workflow**.
+4. Selecione o arquivo JSON baixado.
+5. Configure suas credenciais (Supabase, APIs, etc.).
+6. Ative o workflow.
 
-Requirements
+## Requisitos
 
-n8n (self-hosted or cloud)
-Supabase database
-LLM provider (OpenAI or compatible)
-Messaging platform integration (optional)
+- n8n (self-hosted ou cloud)
+- Banco de dados Supabase
+- Provedor de LLM (OpenAI ou compatível)
+- Integração com plataforma de mensageria (opcional)
