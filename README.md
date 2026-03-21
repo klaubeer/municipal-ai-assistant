@@ -1,315 +1,183 @@
-# 🇧🇷 PT-BR
+<div align="center">
 
-# O Democrata - Assistente de IA para informações públicas municipais
+# 🏛️ O Democrata
 
-Assistente baseado em **Inteligência Artificial e Large Language Models** desenvolvido para simplificar o acesso a **informações públicas municipais**.
+**Assistente de IA para consulta de informações públicas municipais em linguagem natural — combinando RAG, scraping automatizado e dashboard analítico para aproximar o cidadão da gestão pública.**
 
-O sistema permite que cidadãos consultem informações governamentais utilizando **linguagem natural**, eliminando a necessidade de navegar manualmente por portais institucionais complexos ou documentos extensos.
+[![Python](https://img.shields.io/badge/Backend-Python-3776AB?style=flat-square&logo=python&logoColor=white)](https://python.org)
+[![Supabase](https://img.shields.io/badge/Banco_de_Dados-Supabase-3ECF8E?style=flat-square&logo=supabase&logoColor=white)](https://supabase.com)
+[![Puppeteer](https://img.shields.io/badge/Scraping-Puppeteer-40B5A4?style=flat-square&logo=puppeteer&logoColor=white)](https://pptr.dev)
 
-A plataforma atua como uma **interface inteligente para dados públicos**, combinando **RAG, processamento de documentos e recuperação semântica** para fornecer respostas precisas baseadas em fontes oficiais.
-
----
-
-# Objetivo do Projeto
-
-O objetivo do projeto é **reduzir a fricção no acesso à informação pública**, permitindo que cidadãos obtenham respostas rápidas e confiáveis sobre:
-
-* leis municipais
-* decretos
-* serviços públicos
-* procedimentos administrativos
-* impostos e taxas
-* obras e infraestrutura urbana
-* regulamentações municipais
-
-A solução busca melhorar **transparência, acesso à informação e eficiência administrativa**.
+</div>
 
 ---
 
-# Arquitetura do Sistema
+## Visão Geral
 
-O sistema segue uma arquitetura baseada em **Retrieval-Augmented Generation (RAG)** para garantir que as respostas do modelo sejam baseadas em dados reais.
+O Democrata é uma plataforma de **IA aplicada à transparência pública**. O cidadão digita uma pergunta em linguagem natural — sobre leis, decretos, impostos, serviços ou procedimentos municipais — e recebe uma resposta precisa, fundamentada em documentos oficiais.
 
-Fluxo simplificado:
+O sistema elimina a necessidade de navegar por portais institucionais complexos ou ler legislação extensa. Por baixo, um pipeline completo coleta dados de fontes governamentais, processa e indexa os documentos, e serve as consultas via RAG — garantindo que cada resposta seja rastreável a uma fonte pública real.
+
+Além do assistente, o projeto inclui um **dashboard analítico** que transforma as perguntas da população em dados estratégicos para gestores públicos.
+
+---
+
+## Arquitetura
 
 ```
-Usuário
-↓
-Interface Conversacional
-↓
-Processamento de Pergunta
-↓
-Busca Semântica (Vector Search)
-↓
-Recuperação de Documentos Oficiais
-↓
-Seleção de Contexto
-↓
-LLM
-↓
-Resposta com base em documentos públicos
-```
-
----
-
-# Pipeline de Dados
-
-O projeto inclui um pipeline de ingestão e processamento de dados públicos.
-
-### Coleta de dados
-
-Informações são obtidas através de:
-
-* portais institucionais
-* publicações oficiais
-* legislação municipal
-* documentos administrativos
-
-Utilizando **web scraping automatizado**.
-
----
-
-### Processamento de documentos
-
-Os dados coletados passam por um pipeline de processamento:
-
-```
-Web Scraping
-↓
-Limpeza de dados
-↓
-Parsing de documentos
-↓
-Chunking de texto
-↓
-Geração de embeddings
-↓
-Armazenamento vetorial
+Portais Institucionais / Publicações Oficiais
+               │
+               ▼
+     Pipeline de Scraping (Puppeteer)
+               │
+               ▼
+     Processamento de Documentos
+      ├─── Limpeza de dados
+      ├─── Parsing e chunking
+      └─── Geração de embeddings
+               │
+               ▼
+     Supabase (pgvector)
+               │
+        ┌──────┴──────┐
+        ▼             ▼
+  Assistente      Dashboard
+ Conversacional   Analítico
+        │
+        ▼
+   Pergunta do Usuário
+        │
+        ▼
+   Embedding da Query
+        │
+        ▼
+   Busca Semântica
+        │
+        ▼
+   Recuperação de Documentos
+        │
+        ▼
+   LLM + Contexto Oficial
+        │
+        ▼
+   Resposta Fundamentada
 ```
 
 ---
 
-# Sistema de Recuperação (RAG)
+## Componentes Principais
 
-Os documentos processados são armazenados em um **vector database**, permitindo busca semântica eficiente.
+### 🔍 Pipeline de Ingestão de Dados
 
-Quando um usuário faz uma pergunta:
-
-1. a pergunta é transformada em embedding
-2. o sistema executa busca semântica
-3. os documentos mais relevantes são recuperados
-4. o contexto é enviado ao LLM
-5. o modelo gera uma resposta fundamentada
-
-Esse processo reduz **alucinações do modelo** e garante respostas baseadas em dados públicos.
-
----
-
-# Dashboard Analítico
-
-Além do assistente conversacional, o projeto inclui um **painel analítico** que monitora as interações dos usuários.
-
-O dashboard permite:
-
-* identificar perguntas recorrentes da população
-* detectar demandas de serviços públicos
-* monitorar temas mais consultados
-* gerar insights para gestores públicos
-
-Isso permite transformar as consultas da população em **dados estratégicos para gestão pública**.
-
----
-
-# Funcionalidades
-
-✔ Consulta de informações públicas em linguagem natural
-✔ Recuperação semântica de documentos oficiais
-✔ Pipeline de scraping e atualização de dados
-✔ Assistente conversacional baseado em LLM
-✔ Dashboard analítico de consultas da população
-✔ Insights para gestão pública e transparência
-
----
-
-# Stack Tecnológica
-
-### Inteligência Artificial
-
-* Large Language Models (LLMs)
-* Retrieval-Augmented Generation (RAG)
-* AI Agents
-* Prompt Engineering
-
----
-
-### Data Engineering
-
-* Web Scraping
-* Puppeteer
-* Document Processing
-* Data Pipelines
-
----
-
-### Infraestrutura
-
-* Python
-* Supabase
-* Vector Databases
-* REST APIs
-
----
-
-### Analytics
-
-* BI Dashboards
-* Query Monitoring
-* Data Insights
-
----
-
-# 🇺🇸 English Version
-
-# AI Assistant for Municipal Public Information
-
-AI-powered assistant designed to simplify access to **municipal public information** using natural language.
-
-The system enables citizens to query government-related information without manually navigating complex institutional portals or legal documents.
-
-The platform acts as an **intelligent interface for public data**, combining **Retrieval-Augmented Generation (RAG), document processing, and semantic search** to provide grounded answers based on official sources.
-
----
-
-# Project Objective
-
-The goal of the project is to **reduce friction in accessing public information**, enabling citizens to quickly obtain reliable answers about:
-
-* municipal laws
-* decrees
-* public services
-* administrative procedures
-* taxes and fees
-* infrastructure works
-* municipal regulations
-
-The solution aims to improve **transparency, accessibility, and efficiency in public services**.
-
----
-
-# System Architecture
-
-The system follows a **Retrieval-Augmented Generation architecture**.
-
-High-level flow:
+Documentos públicos são coletados automaticamente de portais municipais via **Puppeteer**, passando por um pipeline estruturado antes de chegarem ao vector store:
 
 ```
-User
-↓
-Conversational Interface
-↓
-Query Processing
-↓
-Semantic Search
-↓
-Official Document Retrieval
-↓
-Context Selection
-↓
-LLM
-↓
-Answer grounded in public documents
+Web Scraping (Puppeteer)
+        │
+        ▼
+  Limpeza e Normalização
+        │
+        ▼
+  Parsing de Documentos
+        │
+        ▼
+  Chunking de Texto
+        │
+        ▼
+  Geração de Embeddings
+        │
+        ▼
+  Upsert no Supabase pgvector
 ```
 
----
+Fontes incluem legislação municipal, decretos, atos administrativos, tabelas de taxas e publicações de serviços públicos. O pipeline pode ser agendado para manter a base atualizada automaticamente.
 
-# Data Pipeline
+### 🧠 Sistema de Recuperação (RAG)
 
-The project includes an automated public data ingestion pipeline.
+Quando o cidadão faz uma pergunta, o sistema:
 
-### Data collection
+1. Converte a pergunta em embedding
+2. Executa busca semântica no vector store
+3. Recupera os trechos de documentos mais relevantes
+4. Monta o contexto e envia ao LLM
+5. Retorna uma resposta fundamentada com rastreabilidade à fonte oficial
 
-Data is collected from:
+Isso reduz alucinações e garante que o modelo nunca "invente" informações sobre legislação ou procedimentos — cada resposta tem um documento público como origem.
 
-* government portals
-* official publications
-* municipal legislation
-* administrative documents
+### 📊 Dashboard Analítico
 
-Using automated **web scraping pipelines**.
+O painel transforma o volume de consultas em inteligência para a gestão pública:
 
----
+- Identifica perguntas recorrentes da população
+- Mapeia demandas por serviços públicos
+- Monitora os temas mais consultados por período
+- Gera insights acionáveis para administradores e gestores
 
-### Document processing
-
-Collected data is processed through:
-
-```
-Web Scraping
-↓
-Data Cleaning
-↓
-Document Parsing
-↓
-Text Chunking
-↓
-Embedding Generation
-↓
-Vector Storage
-```
+Isso permite que prefeituras e órgãos públicos entendam, de forma quantitativa, quais são as dúvidas e necessidades reais dos cidadãos.
 
 ---
 
-# Retrieval System (RAG)
+## Casos de Uso
 
-Processed documents are stored in a **vector database**, enabling semantic retrieval.
-
-When a user asks a question:
-
-1. the query is converted into an embedding
-2. semantic search is performed
-3. the most relevant documents are retrieved
-4. context is passed to the LLM
-5. the model generates a grounded response
-
-This significantly reduces hallucinations and improves response accuracy.
+| Consulta do Cidadão | O Sistema Faz |
+|---|---|
+| "Como emitir minha certidão negativa de débitos?" | Recupera o procedimento oficial e links do portal |
+| "Qual é o prazo para pagamento do IPTU com desconto?" | Busca o decreto vigente com as datas e condições |
+| "Quais documentos preciso para abrir um alvará?" | Recupera a legislação e checklist oficial |
+| "A Lei X ainda está em vigor?" | Consulta o histórico legislativo municipal |
+| "Onde denunciar um problema de saneamento?" | Retorna os canais oficiais de atendimento |
 
 ---
 
-# Analytical Dashboard
+## Stack Tecnológica
 
-The project also includes an **analytical dashboard** that tracks user queries.
-
-The dashboard allows:
-
-* identification of recurring citizen questions
-* monitoring of public service demand
-* analysis of most consulted topics
-* generation of insights for public administrators
-
-This turns citizen interactions into **actionable data for public governance**.
-
----
-
-# Key Features
-
-✔ Natural language access to public information
-✔ Semantic retrieval of official documents
-✔ Automated data scraping pipeline
-✔ LLM-powered conversational assistant
-✔ Public query analytics dashboard
-✔ Insights for transparency and governance
+| Camada | Tecnologia |
+|---|---|
+| **LLM** | Large Language Models via API |
+| **RAG** | Retrieval-Augmented Generation com pgvector |
+| **Base Vetorial** | Supabase pgvector |
+| **Scraping** | Puppeteer (Node.js) |
+| **Backend** | Python |
+| **Banco de Dados** | Supabase (PostgreSQL) |
+| **Analytics** | Dashboard BI sobre logs de consulta |
 
 ---
 
-# Tech Stack
+## Decisões de Arquitetura
 
-Python
-Large Language Models (LLM)
-Retrieval-Augmented Generation (RAG)
-AI Agents
-Web Scraping
-Puppeteer
-Supabase
-Vector Databases
-REST APIs
-BI & Analytics Dashboards
+**RAG sobre fine-tuning** — documentos municipais mudam com frequência (decretos, leis, tabelas de taxas). Fine-tuning seria obsoleto rapidamente. Com RAG, basta re-indexar os documentos novos e o sistema já responde com as informações atualizadas, sem retreinar o modelo.
+
+**Supabase como backend unificado** — o mesmo projeto Supabase serve como vector store (pgvector), banco relacional (logs, metadados de documentos, analytics) e backend de autenticação. Reduz operações e mantém tudo em um lugar.
+
+**Scraping com Puppeteer** — portais municipais frequentemente usam JavaScript pesado para renderizar conteúdo, tornando scrapers HTTP simples ineficazes. Puppeteer roda um browser headless real, garantindo que o conteúdo renderizado seja capturado corretamente.
+
+**Dashboard como produto secundário** — as consultas dos cidadãos são, por si só, dados valiosos. O dashboard não é um extra cosmético — é o mecanismo que transforma o assistente em uma ferramenta de gestão pública, justificando adoção institucional.
+
+---
+
+## Impacto Esperado
+
+- **Para o cidadão**: acesso imediato a informações públicas sem burocracia
+- **Para gestores**: visibilidade sobre as principais dúvidas e demandas da população
+- **Para a administração pública**: redução de carga em canais de atendimento para perguntas simples e repetitivas
+
+---
+
+## Como Começar
+
+### Pré-requisitos
+
+- Python 3.10+
+- Node.js (para o pipeline de scraping com Puppeteer)
+- Projeto Supabase com extensão pgvector habilitada
+- Chave de API do provedor LLM
+
+### Configuração
+
+1. **Clone** este repositório
+2. **Instale as dependências** Python e Node.js
+3. **Configure as variáveis de ambiente** (ver `.env.example`)
+4. **Execute o pipeline de ingestão** para popular o vector store com os documentos municipais
+5. **Inicie o servidor** — o assistente estará disponível
+
+Referência completa de configuração em [`docs/setup.md`](docs/setup.md).
