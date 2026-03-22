@@ -181,3 +181,6 @@ Isso permite que prefeituras e órgãos públicos entendam, de forma quantitativ
 5. **Inicie o servidor** — o assistente estará disponível
 
 Referência completa de configuração em [`docs/setup.md`](docs/setup.md).
+
+## Autor
+**Klauber Fischer**
